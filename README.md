@@ -1,100 +1,97 @@
-# Documentación de Limpieza y Análisis Exploratorio
+# 📈 Predicción de Tendencias en Criptomonedas usando Machine Learning
 
-## Dataset 1: NEAR
-
-Tras la adquisición del dataset, se eliminaron columnas irrelevantes para el análisis: `Name` y `Symbol`, ya que todas las entradas correspondían exclusivamente a monedas **NEAR**. También se descartaron las columnas `Cat1` y `Cat2`, debido a que contenían únicamente valores nulos.
-
-Después de esta limpieza, se conservaron las variables:
-- `Date`
-- `Volume`
-- `MarketCap`
-- `Price`
-
-El dataset final contiene **137 observaciones completas**. Se transformó la columna `Date` al tipo `datetime` y se verificó que no existían registros duplicados.
-
-### Outliers
-Se detectaron los siguientes porcentajes de valores atípicos:
-- `Volume`: **0.29%**
-- `MarketCap`: **0%**
-- `Price`: **4.27%**
-
-Debido a que estos porcentajes son bajos, se consideró que no era necesario tratarlos para este análisis.
-
-### Correlaciones
-
-El análisis visual mediante un `pairplot` y un mapa de calor mostró las siguientes correlaciones relevantes:
-
-| Variables           | Correlación |
-|---------------------|-------------|
-| MarketCap - Volume  | 0.55        |
-| MarketCap - Price   | 0.88        |
-
-Estas correlaciones tienen sentido, dado que el valor de capitalización de mercado está influenciado tanto por el volumen como por el precio de la moneda.
+Este proyecto busca predecir la evolución del precio de la criptomoneda **NEAR Protocol** a través de técnicas de Machine Learning, utilizando datasets históricos y una metodología basada en CRISP-DM.
 
 ---
 
-## Dataset 2: Coincodex
+## 🧠 Contexto
 
-Este dataset contiene **1669 registros** con las siguientes variables:
-
-- `Date`
-- `Open`
-- `High`
-- `Low`
-- `Close`
-- `Volume`
-- `MarketCap`
-
-Se transformó `Date` al tipo `datetime` y se verificó que no existen valores nulos ni duplicados.
-
-### Análisis Visual
-
-El `pairplot` reveló fuertes relaciones entre las variables financieras (`Open`, `High`, `Low`, `Close`), lo cual es esperado en series temporales de precios.
-
-El diagrama de caja evidenció **outliers en `Volume` y `MarketCap`**.
-
-### Suavizado de MarketCap
-
-Para eliminar los outliers en `MarketCap`, se aplicó un **suavizado exponencial simple** con la siguiente línea de código:
-
-```python
-from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-ses_model = SimpleExpSmoothing(data['Market Cap']).fit(smoothing_level=0.2, optimized=False)
-```
-
-Esto suavizó la serie de `MarketCap` y eliminó los outliers detectados.
-
-### Porcentaje de Outliers
-
-| Variable    | Porcentaje (%) |
-|-------------|----------------|
-| Open        | 4.73           |
-| High        | 5.15           |
-| Low         | 4.43           |
-| Close       | 4.91           |
-| Volume      | 7.91           |
-| Market Cap  | 0.48           |
-
-### Correlaciones Relevantes
-
-| Variable 1    | Variable 2    | Correlación |
-|---------------|---------------|-------------|
-| Open          | High          | 0.997       |
-| Open          | Low           | 0.997       |
-| Open          | Close         | 0.993       |
-| Open          | Volume        | 0.680       |
-| Open          | Market Cap    | 0.855       |
-| High          | Low           | 0.996       |
-| High          | Close         | 0.997       |
-| High          | Volume        | 0.693       |
-| High          | Market Cap    | 0.850       |
-| Low           | Close         | 0.996       |
-| Low           | Volume        | 0.671       |
-| Low           | Market Cap    | 0.861       |
-| Close         | Volume        | 0.684       |
-| Close         | Market Cap    | 0.854       |
-| Volume        | Market Cap    | 0.728       |
-
-**Nota:** La correlación entre `Volume` y `MarketCap` (0.728) es esperada, ya que un mayor volumen de operaciones suele estar asociado a un mayor interés del mercado, lo que también puede reflejarse en una capitalización de mercado más alta.
+Las criptomonedas han ganado popularidad como alternativa descentralizada frente al sistema financiero tradicional. Sin embargo, su volatilidad y falta de regulación representan riesgos para los inversionistas. En este proyecto, aprovechamos el poder de la inteligencia artificial para detectar patrones históricos y evaluar si una criptomoneda puede ser una buena inversión.
 
 ---
+
+## 📊 Datasets
+
+### Dataset 1: Comparativo de Criptomonedas
+
+- **Origen:** CoinGecko
+- **Variables finales:** `Date`, `Symbol`, `TVL`, `MarketCap`, `Price`, `Class`
+- **Observaciones:** 10,404
+- **Preprocesamiento:**
+  - Se eliminaron columnas irrelevantes y nulas.
+  - Conversión de fechas a `datetime`.
+  - Análisis de outliers (casos notables: XLM y COPI).
+  - Análisis de correlaciones con `pairplots` y mapa de calor.
+
+### Dataset 2: NEAR Protocol (detallado)
+
+- **Origen:** CoinCodex
+- **Variables:** `Date`, `Open`, `High`, `Low`, `Close`, `Volume`, `MarketCap`
+- **Observaciones:** 1,669
+- **Preprocesamiento:**
+  - Conversión de fechas a `datetime`.
+  - Eliminación de duplicados y valores nulos.
+  - Suavizado exponencial en `MarketCap` para mitigar outliers.
+  - Análisis de correlaciones fuertes entre variables de precio y volumen.
+
+> 🔗 Todo el código y análisis está disponible en el [repositorio](https://github.com/idaniellavargas/crypto/tree/main).
+
+---
+
+## 🤖 Propuesta
+
+Se propone un modelo de **aprendizaje supervisado** para predecir si una criptomoneda tenderá a subir o bajar su precio, considerando atributos como volumen, precio y categoría. En caso de bajo rendimiento, se considerará un modelo **no supervisado**.
+
+---
+
+## 🧭 Metodología: CRISP-DM
+
+1. **Comprensión del negocio:**  
+   Identificar cómo evaluar criptomonedas para decisiones de inversión.
+
+2. **Comprensión de los datos:**  
+   Recolección de información financiera histórica de NEAR y otras monedas.
+
+3. **Preparación de datos:**  
+   Limpieza, transformación y análisis exploratorio.
+
+4. **Modelado (1):**  
+   Entrenamiento de un modelo supervisado.
+
+5. **Evaluación (1):**  
+   Pruebas con datos reales o nuevas monedas.
+
+6. **Modelado (2) [Fallback]:**  
+   Entrenamiento de modelo no supervisado.
+
+7. **Evaluación (2):**  
+   Validación alternativa y comparación de resultados.
+
+---
+
+## 👥 Integrantes
+
+| Nombre                             | Código      |
+|------------------------------------|-------------|
+| Alfredo Mauricio Aragón Ovalle     | U202210494  |
+| Tarik Gustavo Morales Oliveros     | U202210472  |
+| Rodrigo Alonso Ramírez Cesti       | U202210690  |
+| Daniella Alexandra Crysti Vargas   | U202219211  |
+| Eduardo José Rivas Siesquén        | U202216407  |
+
+---
+
+## 📚 Bibliografía
+
+- CoinCodex. *NEAR Protocol (NEAR) Historical Data.* https://coincodex.com/crypto/near-protocol/historical-data/
+- CoinGecko. *NEAR Protocol USD (Historical Data).* https://www.coingecko.com/en/coins/near/historical_data
+
+---
+
+## 🏫 Curso
+
+**Universidad Peruana de Ciencias Aplicadas**  
+**Curso:** Machine Learning (NRC 399)  
+**Docente:** Diego Rojas Sihuay  
+**Ciclo:** 2025-1  
+**Entrega:** Trabajo parcial  
